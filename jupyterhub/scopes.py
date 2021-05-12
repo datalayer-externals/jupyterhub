@@ -116,6 +116,23 @@ def get_scopes_for(orm_object):
         app_log.warning(f"Authenticated with token {orm_object}")
         owner = orm_object.user or orm_object.service
         token_scopes = roles.expand_roles_to_scopes(orm_object)
+        if orm_object.client_id != "jupyterhub":
+            # oauth tokens can be used to access the service issuing the token,
+            # assuming the owner itself still has permission to do so
+            spawner = orm_object.oauth_client.spawner
+            if spawner:
+                token_scopes.add(
+                    f"access:users:servers!server={spawner.user.name}/{spawner.name}"
+                )
+            else:
+                service = orm_object.oauth_client.service
+                if service:
+                    token_scopes.add(f"access:services!service={service.name}")
+                else:
+                    app_log.warning(
+                        f"Token {orm_object} has no associated service or spawner!"
+                    )
+
         owner_scopes = roles.expand_roles_to_scopes(owner)
         if 'all' in token_scopes:
             token_scopes.remove('all')
