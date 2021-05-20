@@ -11,10 +11,8 @@ from tornado.log import app_log
 from .. import orm
 from .. import roles
 from ..scopes import get_scopes_for
-from ..utils import maybe_future
 from ..utils import utcnow
 from .mocking import MockHub
-from .test_scopes import create_temp_role
 from .utils import add_user
 from .utils import api_request
 
