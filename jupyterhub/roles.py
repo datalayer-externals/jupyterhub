@@ -195,7 +195,7 @@ def _get_subscopes(*args, owner=None):
     for role in args:
         scope_list.extend(role.scopes)
 
-    scopes = set(chain.from_iterable(list(map(_expand_scope, scope_list))))
+    scopes = set(chain.from_iterable(map(_expand_scope, scope_list)))
 
     # transform !user filter to !user=ownername
     for scope in scopes:
