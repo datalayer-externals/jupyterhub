@@ -35,20 +35,31 @@ class SelfAPIHandler(APIHandler):
         user = self.current_user
         if user is None:
             raise web.HTTPError(403)
+
+        _added_scopes = set()
         if isinstance(user, orm.Service):
             # ensure we have the minimal 'identify' scopes for the token owner
-            self.raw_scopes.update(scopes.identify_scopes(user))
-            self.parsed_scopes = scopes.parse_scopes(self.raw_scopes)
-            model = self.service_model(user)
+            identify_scopes = scopes.identify_scopes(user)
+            get_model = self.service_model
         else:
-            self.raw_scopes.update(scopes.identify_scopes(user.orm_user))
+            identify_scopes = scopes.identify_scopes(user.orm_user)
+            get_model = self.user_model
+
+        # ensure we have permission to identify ourselves
+        # all tokens can do this on this endpoint
+        for scope in identify_scopes:
+            if scope not in self.raw_scopes:
+                _added_scopes.add(scope)
+                self.raw_scopes.add(scope)
+        if _added_scopes:
+            # re-parse with new scopes
             self.parsed_scopes = scopes.parse_scopes(self.raw_scopes)
-            model = self.user_model(user)
-        # validate return, should have at least kind and name,
-        # otherwise our filters did something wrong
-        for key in ("kind", "name"):
-            if key not in model:
-                raise ValueError(f"Missing identify model for {user}: {model}")
+
+        model = get_model(user)
+
+        # add scopes to identify model,
+        # but not the scopes we added to ensure we could read our own model
+        model["scopes"] = sorted(self.raw_scopes.difference(_added_scopes))
         self.write(json.dumps(model))
 
 

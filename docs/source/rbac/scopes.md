@@ -97,6 +97,7 @@ Table 1. Available scopes and their hierarchy
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`read:users:roles` | Read-only access to a list of users' roles names. |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`read:users:groups` | Read-only access to a list of users' group names. |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`read:users:activity` | Read-only access to users' activity. |
+| `access:users:servers` | Permission to access user servers |
 | `admin:users:servers` | Grants read, start/stop, create and delete permissions to users' servers and their state. |
 | &nbsp;&nbsp;&nbsp;`admin:users:server_state` | Grants access to servers' state only. |
 | &nbsp;&nbsp;&nbsp;`users:servers` | Allows for starting/stopping users' servers in addition to read access to their models. _Does not include the server state_. |
@@ -106,6 +107,7 @@ Table 1. Available scopes and their hierarchy
 | `admin:groups` | Grants read, write, create and delete access to groups. |
 | &nbsp;&nbsp;&nbsp;`groups` | Grants read and write permissions to groups, including adding/removing users to/from groups. |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`read:groups` | Read-only access to groups. |
+| `access:services` | Permission to access services |
 | `read:services` | Read-only access to service models. |
 | &nbsp;&nbsp;&nbsp;`read:services:name` | Read-only access to service names. |
 | &nbsp;&nbsp;&nbsp;`read:services:roles` | Read-only access to a list of service roles names. |

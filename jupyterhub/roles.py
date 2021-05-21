@@ -17,11 +17,13 @@ def get_default_roles():
         {
             'name': 'user',
             'description': 'Standard user privileges',
-            'scopes': ['self'],
+            'scopes': [
+                'self',
+            ],
         },
         {
             'name': 'admin',
-            'description': 'Admin privileges (currently can do everything)',
+            'description': 'Admin privileges (can do everything)',
             'scopes': [
                 'admin:users',
                 'admin:users:servers',
@@ -31,14 +33,17 @@ def get_default_roles():
                 'read:hub',
                 'proxy',
                 'shutdown',
+                'access:services',
+                'access:users:servers',
             ],
         },
         {
             'name': 'server',
             'description': 'Post activity only',
             'scopes': [
-                'users:activity!user'
-            ],  # TO DO - fix scope to refer to only self once implemented
+                'users:activity!user',
+                'access:users:servers!user',
+            ],
         },
         {
             'name': 'token',
@@ -59,6 +64,7 @@ def expand_self_scope(name):
     users:activity
     users:servers
     users:tokens
+    access:users:servers
     """
     scope_list = [
         'users',
@@ -69,6 +75,8 @@ def expand_self_scope(name):
         'users:tokens',
     ]
     read_scope_list = ['read:' + scope for scope in scope_list]
+    # access doesn't want the 'read:' prefix
+    scope_list.append('access:users:servers')
     scope_list.extend(read_scope_list)
     return {"{}!user={}".format(scope, name) for scope in scope_list}
 
@@ -101,6 +109,8 @@ def _get_scope_hierarchy():
         'read:hub': None,
         'proxy': None,
         'shutdown': None,
+        'access:users:servers': None,
+        'access:services': None,
     }
 
     return scopes
@@ -185,7 +195,7 @@ def _get_subscopes(*args, owner=None):
     for role in args:
         scope_list.extend(role.scopes)
 
-    scopes = set(chain.from_iterable(list(map(_expand_scope, scope_list))))
+    scopes = set(chain.from_iterable(map(_expand_scope, scope_list)))
 
     # transform !user filter to !user=ownername
     for scope in scopes:
